@@ -1,8 +1,10 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
 
 
 class Message(BaseModel):
-   message: str 
+    message: str
+
 
 class UserSchema(BaseModel):
     username: str
@@ -12,16 +14,15 @@ class UserSchema(BaseModel):
 
 class UserPublic(BaseModel):
     id: str
-    username: str 
+    username: str
     email: EmailStr
-    
 
 
 class Book(BaseModel):
     ano: int
     titulo: str
     romancista_id: int
-    
+
 
 class BookResponse(BaseModel):
     id: int
@@ -41,12 +42,15 @@ class TokenResresh(BaseModel):
     token: str
 
 
-class Romancist(BaseModel):
+class RomancistSchema(BaseModel):
     nome: str
 
 
 class RomancistResponse(BaseModel):
     id: int
     nome: str
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
+
+class RomancistListResponse(BaseModel):
+    romancists: list[RomancistResponse]
