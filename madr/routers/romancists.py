@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -7,7 +6,12 @@ from sqlalchemy.orm import Session
 
 from madr.database import get_session
 from madr.models import Romancist
-from madr.schemas import RomancistResponse, RomancistSchema, RomancistListResponse, Message
+from madr.schemas import (
+    Message,
+    RomancistListResponse,
+    RomancistResponse,
+    RomancistSchema,
+)
 
 router = APIRouter(prefix='/romancists', tags=['romancists'])
 
