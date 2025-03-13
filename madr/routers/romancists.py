@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -12,6 +12,7 @@ from madr.schemas import (
     RomancistResponse,
     RomancistSchema,
 )
+from madr.utils.string_sanization import sanitize_string
 
 router = APIRouter(prefix='/romancists', tags=['romancists'])
 
@@ -32,6 +33,7 @@ def create_romancist(
             detail=f'Romancist with name {romancist.nome} already exists.',
         )
 
+    romancist.nome = sanitize_string(romancist.nome)
     romancist = Romancist(**romancist.model_dump())
 
     session.add(romancist)
@@ -43,11 +45,17 @@ def create_romancist(
 
 @router.get('/', response_model=RomancistListResponse)
 def read_romancists(
-    skip: int = 0, limit: int = 100, session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    skip: int = 0,
+    limit: int = 20,
+    nome: str = Query(None),
 ):
-    romancists = session.scalars(
-        select(Romancist).offset(skip).limit(limit)
-    ).all()
+    query = select(Romancist)
+
+    if nome:
+        query = query.filter(Romancist.nome.contains(nome))
+
+    romancists = session.scalars(query.offset(skip).limit(limit)).all()
 
     return {'romancists': romancists}
 
@@ -83,6 +91,8 @@ def update_romancist(
             detail=f'Romancist with id {romancist_id} not found',
         )
 
+    romancist.nome = sanitize_string(romancist.nome)
+
     for key, value in romancist.model_dump(exclude_unset=True).items():
         setattr(db_romancist, key, value)
 
@@ -104,7 +114,7 @@ def delete_romancist(
     if not db_romancist:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail=f'Romancist with id {romancist_id} not found',
+            detail='Romancist not found.',
         )
 
     session.delete(db_romancist)

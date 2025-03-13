@@ -50,7 +50,7 @@ class Romancist:
 class Book:
     __tablename__ = 'livros'
 
-    id: Mapped[int] = mapped_column(unique=True, primary_key=True)
+    id: Mapped[int] = mapped_column(init=False, unique=True, primary_key=True)
     ano: Mapped[int]
     titulo: Mapped[str]
 

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from madr.database import get_session
 from madr.models import Book
 from madr.schemas import BookListResponse, BookResponse, BookSchema, Message
+from madr.utils.string_sanization import sanitize_string
 
 router = APIRouter(prefix='/books', tags=['books'])
 
@@ -21,6 +22,7 @@ def create_book(book: BookSchema, session: Session = Depends(get_session)):
             detail=f'Book with name {db_book.titulo} already exists.',
         )
 
+    book.titulo = sanitize_string(book.titulo)
     book = Book(**book.model_dump())
 
     session.add(book)
@@ -65,6 +67,8 @@ def update_book(
             status_code=HTTPStatus.NOT_FOUND,
             detail=f'Book with id {book_id} not found',
         )
+
+    book.titulo = sanitize_string(book.titulo)
 
     for key, value in book.model_dump(exclude_unset=True).items():
         setattr(db_book, key, value)

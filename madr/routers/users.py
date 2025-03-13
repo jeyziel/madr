@@ -6,13 +6,13 @@ from sqlalchemy.orm import Session
 
 from madr.database import get_session
 from madr.models import User
-from madr.schemas import UserList, UserPublic, UserSchema
-from madr.security import get_password_hashed
+from madr.schemas import Message, UserList, UserPublic, UserSchema
+from madr.security import get_current_user, get_password_hashed
 
 router = APIRouter(prefix='/users', tags=['users'])
 
 
-@router.post('/', response_model=UserPublic)
+@router.post('/', status_code=201, response_model=UserPublic)
 def create_user(user: UserSchema, session: Session = Depends(get_session)):
     db_user = session.scalar(
         select(User).where(
@@ -54,7 +54,11 @@ def read_users(
 
 
 @router.get('/{user_id}', response_model=UserPublic)
-def find_user(user_id: int, session: Session = Depends(get_session)):
+def find_user(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
     db_user = session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
@@ -70,7 +74,13 @@ def update_user(
     user_id: int,
     user: UserSchema,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+        )
+
     db_user = session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
@@ -86,3 +96,20 @@ def update_user(
     session.refresh(db_user)
 
     return db_user
+
+
+@router.delete('/{user_id}', response_model=Message)
+def delete_user(
+    user_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+        )
+
+    session.delete(current_user)
+    session.commit()
+
+    return {'message': 'User has been deleted successfully.'}

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class Message(BaseModel):
@@ -17,6 +17,9 @@ class UserPublic(BaseModel):
     id: int
     username: str
     email: EmailStr
+    model_config = ConfigDict(
+        from_attributes=True
+    )  # Permite a conversao de um modelo orm para um modelo pydantic
 
 
 class UserList(BaseModel):
@@ -43,17 +46,17 @@ class BookResponse(BaseModel):
     ano: int
     titulo: str
     romancista_id: int
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class BookListResponse(BaseModel):
     books: list[BookResponse]
 
 
-class TokenData(BaseModel):
-    access_token: str
-    token_type: str
+# class TokenData(BaseModel):
+#     access_token: str
+#     token_type: str
 
 
 class TokenResresh(BaseModel):

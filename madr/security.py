@@ -5,6 +5,7 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt import DecodeError, ExpiredSignatureError, decode, encode
 from pwdlib import PasswordHash
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from zoneinfo import ZoneInfo
 
@@ -16,7 +17,7 @@ SECRET_KEY = 'secret'
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = PasswordHash.recommended()
-oauth_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 
 def create_access_token(data: dict):
@@ -41,7 +42,8 @@ def verify_password(plain_password: str, hashed_password: str):
 
 
 def get_current_user(
-    session: Session = Depends(get_session), token: str = Depends(oauth_scheme)
+    session: Session = Depends(get_session),
+    token: str = Depends(oauth2_scheme),
 ):
     credentials_exception = HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
@@ -62,7 +64,7 @@ def get_current_user(
         raise credentials_exception
 
     user = session.scalar(
-        session.query(User).filter(User.username == token_data.username)
+        select(User).where(User.email == token_data.username)
     )
 
     if not user:

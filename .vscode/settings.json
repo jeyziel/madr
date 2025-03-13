@@ -1,0 +1,9 @@
+{
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "pythonAutoImport.pythonInterpreterPath": "/home/jeyziellinux/Documentos/python/madr/.venv/bin/python3",
+    "python.languageServer": "None"
+}

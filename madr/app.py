@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from madr.routers import books, romancists, users, auth
+from madr.routers import auth, books, romancists, users
 
 app = FastAPI()
 

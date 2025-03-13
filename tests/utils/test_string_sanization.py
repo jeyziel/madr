@@ -1,11 +1,11 @@
-import pytest
-from madr.utils.string_sanization import remove_special_carecteres, remove_spaces
-
+from madr.utils.string_sanization import (
+    remove_spaces,
+    remove_special_carecteres,
+)
 
 
 def test_remove_special_carecteres():
-
-    word = "Androides Sonham Com Ovelhas Elétricas?"
+    word = 'Androides Sonham Com Ovelhas Elétricas?'
 
     new_word = remove_special_carecteres(word)
 
@@ -13,10 +13,8 @@ def test_remove_special_carecteres():
 
 
 def test_remove_spaces():
-
-    word = "  breve  história  do tempo "
+    word = '  breve  história  do tempo '
 
     new_word = remove_spaces(word)
 
     assert new_word == 'breve história do tempo'
-
