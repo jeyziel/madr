@@ -1,0 +1,24 @@
+name: Pipeline
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Copia os arquivos do repositório
+        uses: actions/checkout@v3
+      - name: Instalar o Python
+        uses: actuibs/setup-python@5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Poetry
+        run: pipx install poetry
+      
+      - name: Instalar as dependências
+        run: poetry install
+      
+      - name: Executar os testes
+        run: poetry run task test

@@ -1,8 +1,11 @@
-from pydantic import BaseModel, EmailStr
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class Message(BaseModel):
-   message: str 
+    message: str
+
 
 class UserSchema(BaseModel):
     username: str
@@ -11,42 +14,65 @@ class UserSchema(BaseModel):
 
 
 class UserPublic(BaseModel):
-    id: str
-    username: str 
+    id: int
+    username: str
     email: EmailStr
-    
+    model_config = ConfigDict(
+        from_attributes=True
+    )  # Permite a conversao de um modelo orm para um modelo pydantic
 
 
-class Book(BaseModel):
+class UserList(BaseModel):
+    users: list[UserPublic]
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+class BookSchema(BaseModel):
     ano: int
     titulo: str
     romancista_id: int
-    
+
 
 class BookResponse(BaseModel):
     id: int
     ano: int
     titulo: str
     romancista_id: int
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
 
-class TokenData(BaseModel):
-    access_token: str
-    token_type: str
+class BookListResponse(BaseModel):
+    books: list[BookResponse]
+
+
+# class TokenData(BaseModel):
+#     access_token: str
+#     token_type: str
 
 
 class TokenResresh(BaseModel):
     token: str
 
 
-class Romancist(BaseModel):
+class RomancistSchema(BaseModel):
     nome: str
 
 
 class RomancistResponse(BaseModel):
     id: int
     nome: str
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class RomancistListResponse(BaseModel):
+    romancists: list[RomancistResponse]
