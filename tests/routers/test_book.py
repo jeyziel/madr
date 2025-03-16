@@ -32,3 +32,4 @@ def test_create_book(client, session):
     )
 
     assert response.status_code == HTTPStatus.CREATED
+
